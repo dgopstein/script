@@ -3,6 +3,8 @@
 // Rank results by popultaion
 // Include Fuzzy matching
 
+import scala.util.Try
+
 object Util {
   def time[R](block: => R): R = {
     val t0 = System.nanoTime()
@@ -45,21 +47,20 @@ object Trie {
 
 object CitySearch {
 
-  case class City(name: String, state: String)
+  case class City(name: String, state: String, pop: Int)
 
-  def listToTrie(seq: Iterator[City]): Trie[City] = {
-    val trie = Trie.apply[City]()
+  def listToTrie(seq: Iterator[City]) = {
+    val trie = Trie[City]()
 
-    seq.foldLeft(trie) { (t: Trie[City], city: City) =>
-      t.add(city.name, city)
+    seq.zipWithIndex.foldLeft(trie) { case (t, (city, i)) =>
+      t.add(city.name, i)
     }
     
   }
 
   def main(args: Array[String]) = {
-    val lines = io.Source.fromFile("/Users/dgopstein/Downloads/US/US.txt").getLines
-    val cities = lines.map{l => val s = l.split("\t"); City(s(2), s(4))}
-    println(cities.take(20).toVector)
+    val lines = io.Source.fromFile("/Users/dgopstein/Downloads/worldcitiespop.txt").getLines
+    val cities = lines.map{l => val s = l.split(","); City(s(1), s(3), Try(s(4).toInt)).toOption.getOrElse(0)}.toArray
     val trie = listToTrie(cities)
     println(trie.get("Cambridge").map(_.vals))
     println(trie.complete("Cambri").take(20))
