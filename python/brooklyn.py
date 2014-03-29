@@ -2,16 +2,12 @@
 
 import heatmap
 import random
-def random_heat():
-    pts = []
-    for x in range(400):
-        pts.append((random.random(), random.random() ))
-
+def map_heat(pts):
     print "Processing %d points..." % len(pts)
 
     hm = heatmap.Heatmap()
     img = hm.heatmap(pts)
-    img.save("classic.png")
+    hm.saveKML("groceries.kml")
 
 import os
 def read_api_key():
@@ -20,22 +16,26 @@ def read_api_key():
 
 from googleplaces import GooglePlaces, types, lang
 def groceries():
+    #BROOKLYN={'lat': 40.645244, 'lng': -73.9449975}
+    BROOKLYN={'lat': 40.692, 'lng': -73.983}
+
     google_places = GooglePlaces(read_api_key())
     
     # You may prefer to use the text_search API, instead.
     query_result = google_places.radar_search(
             keyword='',
-            lat_lng={'lat': 40.645244, 'lng': -73.9449975} ,# keyword='Fish and Chips',
-            radius=20000, types=[types.TYPE_GROCERY_OR_SUPERMARKET])
+            lat_lng=BROOKLYN ,# keyword='Fish and Chips',
+            radius=1850, types=[types.TYPE_GROCERY_OR_SUPERMARKET])
 
 
+    pts = []
     for place in query_result.places:
-        #print place.get_details()
-        #print place.name
-        print place.geo_location
+        #print place.geo_location
+        pts.append((place.geo_location['lng'], place.geo_location['lat']))
 
-    print 'len: '+str(len(query_result.places))
+    return pts
+
 
 
 if __name__ == "__main__":    
-    groceries()
+    map_heat(groceries())
