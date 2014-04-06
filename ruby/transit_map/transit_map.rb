@@ -1,11 +1,15 @@
 #!/usr/bin/env ruby
 
+require 'facets'
+
 def sample(density_level)
   (0..density_level).map{|x| x.to_f / density_level}.repeated_permutation(2)
 end
 
 LatLng = Struct.new(:lat, :lng) do
   def to_a; [lat, lng]; end
+  def to_s; "#{lat},#{lng}"; end
+  def inspect; to_s; end
 end
 
 class Brooklyn
@@ -60,4 +64,61 @@ def kml
 EOS
 end
 
-File.write('transit_map.kml', kml)
+def get(url, params=nil)
+  require 'net/http'
+  require 'openssl'
+  uri = URI.parse(url)
+  uri.query = URI.encode_www_form( params ) if params
+  http = Net::HTTP.new(uri.host, uri.port)
+  http.use_ssl = true
+  http.verify_mode = OpenSSL::SSL::VERIFY_NONE # read into this
+  http.get(uri.request_uri).body
+end
+
+KEY = File.read(ENV['HOME']+'/script/GOOGLE_PLACES_API_KEY').strip
+
+class Array
+  # sum is definited in facets
+  #def sum 
+  #  inject(:+)
+  #end
+
+  def mean
+    sum / size.to_f
+  end
+end
+
+def directions_from(origin)
+  url =  "https://maps.google.com/maps/api/directions/json"
+  params = {
+    origin: origin,
+    destination: Destination,
+    sensor: false,
+    key: KEY,
+    departure_time: 1396743295,
+    mode: 'transit'
+  }
+
+  require 'json'
+  JSON.parse(get(url, params))
+end
+
+def mean_duration(google_json)
+  google_json['routes'].flat_map{|r| r['legs']}.map{|l| l['duration']['value']}.mean
+end
+
+def main
+  File.write('transit_map.kml', kml)
+
+  res = sample_brooklyn.take(2).mash do |origin|
+    google_json = directions_from(origin)
+
+    mean_duration = mean_duration(google_json)
+
+    [origin, mean_duration]
+  end
+
+  p res
+end
+
+main
