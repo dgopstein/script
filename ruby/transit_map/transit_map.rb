@@ -19,10 +19,10 @@ LatLng = Struct.new(:lat, :lng) do
 end
 
 class Brooklyn
-  def self.Top; 40.7206157; end
-  def self.Bottom; 40.6302637; end
-  def self.Left; -74.0040491; end
-  def self.Right; -73.8929842; end
+  def self.Top; 40.752459; end
+  def self.Bottom; 40.569111; end
+  def self.Left; -74.050598; end
+  def self.Right; -73.872070; end
 end
 
 NYUPoly = LatLng.new(40.694074,-73.986932)
@@ -127,7 +127,8 @@ def mean_duration(google_json)
 end
 
 def duration_sample_brooklyn
-  res = sample_brooklyn.mash do |origin|
+  res = sample_brooklyn.map.with_index.mash do |origin, index|
+    puts "[#{index}/#{sample_brooklyn.size}] #{origin}"
     google_json = directions_from(origin)
 
     mean_duration = mean_duration(google_json)
@@ -146,7 +147,7 @@ def cached_duration_samples
     end
   rescue Exception => e
     puts "Re-querying Google: #{e.message}"
-    duration_sample_brooklyn.tap do |hash|
+    duration_sample_brooklyn.reject{|ll, dur| dur.nan?}.tap do |hash|
       File.write(filename, hash.to_json)
     end
   end
