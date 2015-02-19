@@ -43,6 +43,7 @@
 (defn set-main [s]
     (let [word-sets (mash set words)
           input-set (set s)
+          ; strict subset won't understand .'s, will prematurely filter words
           subsets (filter (fn [[wrd st]] (clojure.set/subset? st input-set)) word-sets)]
             (prn (take 10 subsets))
           (permute-main s
