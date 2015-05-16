@@ -5,3 +5,5 @@
 *.png
 *.swp
 *KEY
+
+.DS_Store
