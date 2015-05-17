@@ -6,16 +6,9 @@
     (let [[head tail] (split-with pred coll)]
              (concat head (take n tail))))
 
-(defn next-token [log-str]
-  (let [c (first log-str)]
-    (case c
-      '<' (take-while-and-n-more (not= '>') 1 log-str)
-      c)))
-
-(defn parse-log [log-str]
-  (let [token (next-token log-str)]
-  (conj token
-        (parse-log (drop (count token) log-str)))))
+(def re-meta #"<[^<>]+>")
+(def re-char #".")
+(def re-token (re-pattern (str "(?s)" re-meta "|" re-char)))
 
 (defn -main [& args]
  (let [[opts argv banner] (cli args
@@ -26,7 +19,10 @@
 
      
   (let [filename (first args)
-        file  (slurp filename)]
-       
-    (parse-log file))))
+        file  (slurp filename)
+        tokens (re-seq re-token file)
+        counts (frequencies tokens)
+        sorted (sort-by val > counts)]
+    (println sorted)
+    )))
 
