@@ -1,0 +1,4 @@
+base+system+user+dev
+target
+out_logFile_copy.txt
+.lein-repl-history
