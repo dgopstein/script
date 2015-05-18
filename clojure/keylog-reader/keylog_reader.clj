@@ -33,5 +33,5 @@
         parsed (mapcat parse-shift tokens)
         counts (frequencies parsed)
         sorted (sort-by val > counts)]
-    (println sorted))))
+    (println (clojure.string/join "\n" (map reverse sorted))))))
 
