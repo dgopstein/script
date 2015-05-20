@@ -19,6 +19,10 @@
   (let [downcase (downcase-map token)]
     (if downcase ["<SHIFT>" downcase] [token])))
 
+(defn count-from [fltr input]
+  (count (filter #(.contains fltr %) input)))
+  
+
 (defn -main [& args]
  (let [[opts argv banner] (cli args
                            ["-h" "--help" "Print this help"
@@ -30,8 +34,13 @@
   (let [filename (first args)
         file  (slurp filename)
         tokens (re-seq re-token file)
-        parsed (mapcat parse-shift tokens)
-        counts (frequencies parsed)
+        unshifted (mapcat parse-shift tokens)
+        counts (frequencies unshifted)
         sorted (sort-by val > counts)]
-    (println (clojure.string/join "\n" (map reverse sorted))))))
+    (println (clojure.string/join "\n" (map reverse sorted))
+
+    (println "!@#$%^&*(): " (count-from "!@#$%^&*()" tokens))
+    (println "1234567890: " (count-from "1234567890" tokens))
+    
+    ))))
 
