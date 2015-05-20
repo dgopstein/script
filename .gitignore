@@ -4,6 +4,7 @@
 *.o
 *.png
 *.swp
+*.swo
 *KEY
 
 .DS_Store
