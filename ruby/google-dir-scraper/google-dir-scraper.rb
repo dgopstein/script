@@ -14,7 +14,7 @@ def find_items(query, max_cnt = 5000)
   while !finished
     search = Google::Search::Web.new do |s|
       s.query = query
-      s.size = :large
+      #s.size = :large
       #s.each_response { print '.'; $stdout.flush }
       s.offset = offset
     end
@@ -24,6 +24,8 @@ def find_items(query, max_cnt = 5000)
       finished = true
     end
     search_items = search.to_a
+    p search_items.size
+    search_items.each{|i| p i.uri }
     items += search_items
     if search_items.empty?
       finished = true 
