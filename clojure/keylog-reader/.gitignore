@@ -1,4 +1,5 @@
 base+system+user+dev
 target
-out_logFile*.txt
 .lein-repl-history
+logs/
+csv/

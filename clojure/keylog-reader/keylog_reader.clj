@@ -37,10 +37,10 @@
         unshifted (mapcat parse-shift tokens)
         counts (frequencies unshifted)
         sorted (sort-by val > counts)]
-    (println (clojure.string/join "\n" (map reverse sorted))
+    (println (clojure.string/join "\n" (map (fn [[k v]] (str v "," (pr-str k))) sorted))
 
-    (println "!@#$%^&*(): " (count-from "!@#$%^&*()" tokens))
-    (println "1234567890: " (count-from "1234567890" tokens))
+    ;(println "!@#$%^&*(): " (count-from "!@#$%^&*()" tokens))
+    ;(println "1234567890: " (count-from "1234567890" tokens))
     
     ))))
 
