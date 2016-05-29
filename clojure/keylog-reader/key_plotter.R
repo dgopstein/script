@@ -1,7 +1,16 @@
 library(MASS)
 library(RColorBrewer)
+
+
+n.colors <- 128
+n.buckets <- 800
+n.samples <- 500
+f.jitter <- function() runif(1) * 10
+size.kernel <- 40
+
+
 rf <- colorRampPalette(rev(brewer.pal(11,'Spectral')))
-r <- rf(64)
+r <- rf(n.colors)
 #library(data.table)
 
 
@@ -14,12 +23,11 @@ layout <- read.csv("/Users/dgopstein/script/clojure/keylog-reader/keyboard_layou
 
 keys <- merge(counts, layout, by="key")
 
-sample_presses <- keys[sample(x = 1:nrow(keys), 10000, replace = T, prob = keys$count),]
+sample_presses <- keys[sample(x = 1:nrow(keys), n.samples, replace = T, prob = keys$count),]
 # Add visual noise
-sample_presses$x <- sapply(sample_presses$x, function(x) x + runif(1)*2)
-sample_presses$y <- sapply(sample_presses$y, function(x) x + runif(1)*2)
+sample_presses$x <- sapply(sample_presses$x, function(x) x + f.jitter())
+sample_presses$y <- sapply(sample_presses$y, function(x) x + f.jitter())
 
 
-system.time(kde <- kde2d(sample_presses$x, sample_presses$y, n=400, h=40, lims = c(0, 684, 0, 225)))
+system.time(kde <- kde2d(sample_presses$x, sample_presses$y, n=n.buckets, h=size.kernel, lims = c(0, 684, 0, 225)))
 image(kde, col=r, ylim=c(225,0))
-
