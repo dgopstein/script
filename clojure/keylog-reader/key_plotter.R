@@ -21,7 +21,7 @@ counts <- read.csv("/Users/dgopstein/script/clojure/keylog-reader/csv/count_2016
 layout <- read.csv("/Users/dgopstein/script/clojure/keylog-reader/keyboard_layout.csv",
                  header = TRUE)
 
-keys <- merge(counts, layout, by="key")
+keys <- merge(counts, layout[complete.cases(layout),], by="key")
 
 sample_presses <- keys[sample(x = 1:nrow(keys), n.samples, replace = T, prob = keys$count),]
 # Add visual noise

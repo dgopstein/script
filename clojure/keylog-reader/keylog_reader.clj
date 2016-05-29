@@ -22,6 +22,8 @@
 (defn count-from [fltr input]
   (count (filter #(.contains fltr %) input)))
   
+(defn remove-junk [s]
+  (clojure.string/join "\n" (filter #(< (count %) 3000) (clojure.string/split s #"\n"))))
 
 (defn -main [& args]
  (let [[opts argv banner] (cli args
@@ -31,12 +33,13 @@
      (println banner))
 
      
-  (let [filename (first args)
-        file  (slurp filename)
-        tokens (re-seq re-token file)
-        unshifted (mapcat parse-shift tokens)
-        counts (frequencies unshifted)
-        sorted (sort-by val > counts)]
+  (let [filename   (first args)
+        file       (slurp filename)
+        clean-file (remove-junk file)
+        tokens     (re-seq re-token clean-file)
+        unshifted  (mapcat parse-shift tokens)
+        counts     (frequencies unshifted)
+        sorted     (sort-by val > counts)]
     (println (clojure.string/join "\n" (map (fn [[k v]] (str v "," (pr-str k))) sorted))
 
     ;(println "!@#$%^&*(): " (count-from "!@#$%^&*()" tokens))
