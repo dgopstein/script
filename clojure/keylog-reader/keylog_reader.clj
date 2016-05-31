@@ -19,6 +19,16 @@
   (let [downcase (downcase-map token)]
     (if downcase ["<SHIFT>" downcase] [token])))
 
+(defn rename [token]
+  (get {" " ["<SPACE>"]} token [token]))
+
+(defn fix-tokens [token]
+  ;(reduce #(mapcat %2 %1) token [parse-shift rename]))
+  (let [shifted (parse-shift token)
+        renamed (mapcat rename shifted)]
+    renamed))
+
+
 (defn count-from [fltr input]
   (count (filter #(.contains fltr %) input)))
   
@@ -37,8 +47,8 @@
         file       (slurp filename)
         clean-file (remove-junk file)
         tokens     (re-seq re-token clean-file)
-        unshifted  (mapcat parse-shift tokens)
-        counts     (frequencies unshifted)
+        renamed    (mapcat fix-tokens tokens)
+        counts     (frequencies renamed)
         sorted     (sort-by val > counts)]
     (println (clojure.string/join "\n" (map (fn [[k v]] (str v "," (pr-str k))) sorted))
 
