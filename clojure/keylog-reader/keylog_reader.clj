@@ -1,5 +1,7 @@
 (ns keylog-reader
-  (:require [clojure.tools.cli :refer [cli]]))
+    (:require [clojure.tools.cli :refer [cli]])
+    (:require [clojure.string :as str])
+  )
 
 ; http://stackoverflow.com/questions/18660687/clojure-take-while-and-n-more-items
 (defn take-while-and-n-more [pred n coll]
@@ -33,7 +35,10 @@
   (count (filter #(.contains fltr %) input)))
   
 (defn remove-junk [s]
-  (clojure.string/join "\n" (filter #(< (count %) 3000) (clojure.string/split s #"\n"))))
+  (str/join "\n" (filter
+    #(or (str/starts-with? %1 "![")
+         (< (count %1) 3000))
+    (str/split s #"\n"))))
 
 (defn -main [& args]
  (let [[opts argv banner] (cli args
@@ -50,7 +55,7 @@
         renamed    (mapcat fix-tokens tokens)
         counts     (frequencies renamed)
         sorted     (sort-by val > counts)]
-    (println (clojure.string/join "\n" (map (fn [[k v]] (str v "," (pr-str k))) sorted))
+    (println (str/join "\n" (map (fn [[k v]] (str v "," (pr-str k))) (cons ["count", "key"] sorted)))
 
     ;(println "!@#$%^&*(): " (count-from "!@#$%^&*()" tokens))
     ;(println "1234567890: " (count-from "1234567890" tokens))
