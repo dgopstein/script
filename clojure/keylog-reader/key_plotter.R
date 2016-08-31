@@ -4,11 +4,17 @@ library(data.table)
 library(ppls)
 
 n.colors <- 128
-n.buckets <- 80#0
+n.buckets <- 800
 n.samples <- 1000
 size.kernel <- 50
-
 rf <- colorRampPalette(rev(brewer.pal(11,'Spectral')))
+
+#n.buckets <- 100
+size.kernel <- 20
+rf <- colorRampPalette((brewer.pal(10,'Paired')))
+
+
+
 r <- rf(n.colors)
 
 counts <- read.csv("/Users/dgopstein/script/clojure/keylog-reader/csv/count_2016-05-30.csv", header = TRUE)
